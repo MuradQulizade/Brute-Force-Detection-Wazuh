@@ -96,7 +96,7 @@ Expected:  INFO: Agent is now online. Process unlocked, continuing...
 
 ---
 
-💥 Attack Execution
+##💥 Attack Execution
 Step 1 — Manual verification with xfreerdp
 Before running the full attack, single failed login attempts were made manually to confirm RDP was reachable and events were being generated.
 ```bash 
@@ -105,7 +105,7 @@ xfreerdp /v:192.168.0.104 /u:Administrator /p:wrongpassword /cert:ignore
 Step 2 — Brute force with Crowbar
 # Run brute force — this triggered account lockout
 ```bash
-crowbar -b rdp -s 192.168.0.104/32 -u Administrator -C /tmp/rockyou_clean.txt -n 1 -v
+crowbar -b rdp -s 192.168.0.104/32 -u Administrator -C /tmp/rockyou.txt -n 1 -v
 ```
 Crowbar's repeated attempts hit the account lockout threshold, locking out the Administrator account and generating Event ID 4740.---
 
@@ -168,7 +168,6 @@ Crowbar's repeated attempts hit the account lockout threshold, locking out the A
 | Problem | Root Cause | Fix |
 |---------|-----------|-----|
 | Hydra RDP module failing | Hydra RDP module is experimental | Switched to Crowbar + xfreerdp |
-| Crowbar encoding error | rockyou.txt contains non-UTF-8 bytes | Cleaned with `strings` command |
 | NLA still active after UI change | System Properties only changes `UserAuthentication` key | Changed all 3 registry keys via PowerShell |
 | `account not active for remote desktop` | Administrator not in RDP Users group | `net localgroup "Remote Desktop Users" Administrator /add` |
 | No alerts in Wazuh | Agent offline — port 1514 refused | Agent reconnected automatically; verified via ossec.log |
