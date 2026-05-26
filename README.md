@@ -96,7 +96,7 @@ Expected:  INFO: Agent is now online. Process unlocked, continuing...
 
 ---
 
-##💥 Attack Execution
+## 💥 Attack Execution
 Step 1 — Manual verification with xfreerdp
 Before running the full attack, single failed login attempts were made manually to confirm RDP was reachable and events were being generated.
 ```bash 
